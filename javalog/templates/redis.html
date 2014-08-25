@@ -1,0 +1,150 @@
+{% extends 'index.html' %}
+
+{% block title %}redis{% endblock %}
+
+{% block page-content %}
+{% load staticfiles %}
+<script src="{% static "jquery.js" %}"></script>
+<style type="text/css">
+ .btn_hidden{
+    display:none;
+    visibility:hidden;
+}
+ .span50{
+    width:100%;
+    min-width:100%;
+    min-height:100%;
+    height:100%;
+}
+</style>
+<script type="text/javascript">
+$(document).ready(function(){
+        $("#edit").css("display","none");
+        $('#idc').change(function(){
+            var idc = $(this).children('option:selected').val();
+            var username = $("#username").text();
+            $("#file").val(0); 
+            if(username == 'root'){
+                $("#restart").css("display","inline");
+            }else if(username == "test" && idc == "ceshi"){
+                $("#restart").css("display","inline");
+            }else{
+                $("#restart").css("display","none");
+            }
+            $.getJSON("/redisgetip", {"idc":idc}, function(json){ 
+                var obj = $("#data");
+                obj.val('');
+                $("#ip").empty();
+                $("#ip").append("<option>选择IP</option>");
+                $.each(json,function(i,el)
+                {
+                    $('#ip').append("<option value='" +el + "'>" + el + "</option>");
+                });
+            });
+        });
+        $('#ip').change(function(){
+            var idc = $("#idc").children('option:selected').val();
+            var ip = $(this).children('option:selected').val();
+            $("#edit").css("display","none");
+            //alert(idc);
+            $.getJSON("/redisgetfile", {"idc":idc,"ip":ip}, function(json){ 
+                var obj = $("#data");
+                obj.val('');
+                $("#file").empty();
+                $("#ret").empty();
+                $("#file").append("<option>选择文件</option>");
+                $.each(json,function(i,el)
+                {
+                    $('#file').append("<option value='" +el + "'>" + el + "</option>");
+                });
+            });
+        });
+        $('#file').change(function(){
+            $("#edit").css("display","none");
+            var obj = $("#data");
+            obj.val('');
+        });
+        $('#view').click(function(){
+            var idc = $("#idc").children('option:selected').val();
+            var ip = $("#ip").children('option:selected').val();
+            var file = $("#file").children('option:selected').val();
+            //alert(idc);
+            //$("#edit").css("display","inline");
+            var username = $("#username").text();
+            if(username == 'root'){
+                $("#edit").css("display","inline");
+            }else if(username == "test" && idc == "ceshi"){
+                $("#edit").css("display","inline");
+            }else{
+                $("#edit").css("display","none");
+            }
+            $.getJSON("/redisview", {"idc":idc,"ip":ip,"file":file}, function(json){ 
+                var obj = $("#data");
+                $("#ret").empty();
+                obj.val(json);
+            });
+        });
+        $('#edit').click(function(){
+            var idc = $("#idc").children('option:selected').val();
+            var ip = $("#ip").children('option:selected').val();
+            var file = $("#file").children('option:selected').val();
+            var data = $("#data").val();
+            $.post("/redisedit", {"idc":idc,"ip":ip,"file":file,"data":data}, function(json){
+                var obj = $("#ret");
+                obj.text(json);
+            });
+        });
+        $('#status').click(function(){
+            var idc = $("#idc").children('option:selected').val();
+            var ip = $("#ip").children('option:selected').val();
+            var file = $("#file").children('option:selected').val();
+            $("#edit").css("display","none");
+            $.post("/redisstatus", {"idc":idc,"ip":ip,"file":file}, function(json){
+                var obj = $("#data");
+                $("#ret").empty();
+                obj.val(json);
+            });
+        });
+        $('#restart').click(function(){
+            if(window.confirm('确认重启吗？')){
+            var idc = $("#idc").children('option:selected').val();
+            var ip = $("#ip").children('option:selected').val();
+            var file = $("#file").children('option:selected').val();
+            $("#edit").css("display","none");
+            $.post("/redisrestart", {"idc":idc,"ip":ip,"file":file}, function(json){
+                var obj = $("#data");
+                obj.val('');
+                $("#ret").empty();
+                obj.val(json);
+            });
+        }
+        });
+});
+</script>
+<h3>redis配置文件查看</h3>
+<select name="idc" id="idc" class="input-small" value={{ idc }}>
+<option>选择机房</option>
+{% for idc in idcs %}
+<option>{{ idc }}</option>
+{% endfor %}
+</select>
+<select name="ip" id="ip" class="input-small" value={{ ip }}>
+<option>选择IP</option>
+{% for ip in ips %}
+<option>{{ ip }}</option>
+{% endfor %}
+</select>
+<select name="file" id="file" class="input-small" value={{ file }}>
+<option>选择文件</option>
+{% for file in files %}
+<option>{{ file }}</option>
+{% endfor %}
+</select>
+<button id="view" type="submit" class="btn btn-primary btn-sm hostadd_button">查看文件</button>
+<button id='status' type="submit" class="btn btn-primary btn-sm hostadd_button">查看redis状态</button>
+<button id='restart' type="submit" class="btn btn-primary btn-sm hostadd_button">重启redis状态</button><br>
+<textarea rows=30 class="span50" id="data"></textarea><br>
+<button id="edit" type="submit" class="btn btn-primary btn-sm hostadd_button">保存修改</button>
+<span id="ret"></span><br>
+<hr style="border:0;background-color:#ff0000;height:1px;">
+{% endblock %}

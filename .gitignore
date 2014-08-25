@@ -1,0 +1,11 @@
+*.pyc
+*.db
+*.swp
+*.swo
+*.log
+*.pid
+*.out
+*.bak
+/javalog/test.py
+*.bak
+db.sqlite3

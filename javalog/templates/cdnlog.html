@@ -1,0 +1,137 @@
+{% extends 'index.html' %}
+
+{% block title %}CDN报告{% endblock %}
+
+{% block page-content %}
+{% load staticfiles %}
+<link href="/static/loading/loading.css" type="text/css"  rel="stylesheet"/>
+<script src="{% static "jquery.js" %}"></script>
+<script src="/static/loading/loading-min.js"></script>
+<script src="/static/loading/jquery.bgiframe.min.js"></script>
+<style type="text/css">
+ .btn_hidden{
+	display:none;
+	visibility:hidden;
+}
+ .span50{
+    width:100%;
+    min-width:100%;
+    min-height:75%;
+    height:75%;
+}
+</style>
+<script type="text/javascript">
+$(document).ready(function(){
+
+    $('#chart').click(function(){
+        var site= $('#site').children('option:selected').val();
+        var idc= $('#idc').children('option:selected').val();
+        var ltime= $('#ltime').children('option:selected').val();
+     $.post("/chart", {"site":site,"idc":idc,"ltime":ltime}, function(json){
+       console.log(json);
+       json = window.eval(json);
+       window.dragFun(json);
+       window.PieFun(json);
+    });
+    });
+});
+window.PieFun = function(data){
+    var chart = new iChart.Pie2D({
+        render : 'piediv',
+        data: data,
+        title : {
+            text : '回源率',
+            color : '#3e576f'
+        },
+        footnote : {
+            text : 'jiuxian.com',
+            color : '#486c8f',
+            fontsize : 11,
+            padding : '0 38'
+        },
+        sub_option : {
+            label : {
+                background_color:null,
+                sign:false,//设置禁用label的小图标
+                padding:'0 4',
+                border:{
+                    enable:false,
+                    color:'#666666'
+                },
+                fontsize:11,
+                fontweight:600,
+                color : '#4572a7'
+            },
+            border : {
+                width : 2,
+                color : '#ffffff'
+            }
+        },
+        shadow : true,
+        shadow_blur : 6,
+        shadow_color : '#aaaaaa',
+        shadow_offsetx : 0,
+        shadow_offsety : 0,
+        background_color:'#fefefe',
+        offsetx:-60,//设置向x轴负方向偏移位置60px
+        offset_angle:-120,//逆时针偏移120度
+        showpercent:true,
+        decimalsnum:2,
+        width : 800,
+        height : 400,
+        radius:120
+    });
+    
+    chart.draw();
+};
+     window.dragFun = function(data){
+        var chart = new iChart.Column2D({
+            render : 'canvasDiv',//渲染的Dom目标,canvasDiv为Dom的ID
+            data: data,//绑定数据
+            title : '访问量',//设置标题
+            width : 800,//设置宽度，默认单位为px
+            height : 400,//设置高度，默认单位为px
+            shadow:true,//激活阴影
+            shadow_color:'#c7c7c7',//设置阴影颜色
+           // coordinate:{//配置自定义坐标轴
+              //  scale:[{//配置自定义值轴
+              //       position:'left',//配置左值轴   
+              //       start_scale:0,//设置开始刻度为0
+              //       end_scale:26,//设置结束刻度为26
+              //       scale_space:2,//设置刻度间距
+              //       listeners:{//配置事件
+                       // parseText:function(t,x,y){//设置解析值轴文本
+                            //return {text:t+" cm"}
+                      //  }
+              //      }
+              //  }]
+            //}
+        });
+        //调用绘图方法开始绘图
+        chart.draw();
+    };
+//});
+</script>
+<h3>cdnl日志分析报告</h3>
+<hr style="border:0;background-color:#ff0000;height:1px;">
+<select name="site" id="site" class="input">
+<option value="www">www.jiuxian.com</option>
+<option value="misc">misc.jiuxian.com</option>
+<option value="img06">img06.jiuxian.com</option>
+</select>
+<select name="cdn" id="cdn" class="input">
+<option value="ws">网宿</option>
+<option value="lx">蓝汛</option>
+<option value="sh">搜狐</option>
+</select>
+<select name="ltime" id="ltime" class="input">
+<option value="1">最近1天</option>
+<option value="2">最近2天</option>
+<option value="7">最近7天</option>
+<option value="30">最近30天</option>
+</select>
+<button type="submit" id='chart' class="btn btn-primary btn-sm hostadd_button">查询</button>
+<br>
+<div id='piediv'></div>
+<div id='canvasDiv'></div>
+{% endblock %}

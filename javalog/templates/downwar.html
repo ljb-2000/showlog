@@ -1,0 +1,81 @@
+{% extends 'index.html' %}
+
+{% block title %}down war包{% endblock %}
+
+{% block page-content %}
+{% load staticfiles %}
+<link href="/static/loading/loading.css" type="text/css"  rel="stylesheet"/>
+<script src="{% static "jquery.js" %}"></script>
+<script src="/static/loading/loading-min.js"></script>
+<script src="/static/loading/jquery.bgiframe.min.js"></script>
+<style type="text/css">
+ .btn_hidden{
+	display:none;
+	visibility:hidden;
+}
+ .span50{
+    width:100%;
+    min-width:100%;
+    min-height:75%;
+    height:75%;
+}
+</style>
+<script type="text/javascript">
+$(document).ready(function(){
+        var loading = new ol.loading({id:"loading"});
+		$('#project_name').change(function(){
+			var name = $(this).children('option:selected').val();
+			//alert(name);
+			$.getJSON("/getIdc", {"name":name}, function(json){ 
+                var obj = $("#data");
+                obj.val('');
+				$("#idc").empty();
+                $("#idc").append("<option>选择机房</option>");
+                $("#ip").append("<option>选择IP</option>");
+                $("#file").append("<option>选择文件</option>");
+				$.each(json,function(i,el)
+				{
+					$('#idc').append("<option value='" +el + "'>" + el + "</option>");
+				});
+			});
+		});
+
+        $('#down').click(function(){
+                var name= $('#project_name').children('option:selected').val();
+                var idc= $('#idc').children('option:selected').val();
+                loading.show();
+                $.getJSON("/war", {"name":name,"idc":idc}, function(json){
+                   // console.log(json);
+                    loading.hide();
+                    if (json != 'false'){
+                    window.location.href="http://192.168.10.249:8009/" + json;
+                    //window.location.href="http://192.168.5.30:8009/" + name +".war";
+                    }else{
+                    alert('移动暂时不支持下载或者由于下载的war包与线上不一致，无法下载，请联系管理员，谢谢！！！');
+                    }
+                });
+        });
+
+});
+
+</script>
+<div id="loading">
+<h3>下载war包</h3>
+<hr style="border:0;background-color:#ff0000;height:1px;">
+<select name="name" id="project_name" class="input" value={{ name }}>
+<option>选择工程名</option>
+{% for name in names %}
+<option>{{ name }}</option>
+{% endfor %}
+</select>
+<select name="idc" id="idc" class="input-small" value={{ idc }}>
+<option>选择机房</option>
+{% for idc in idcs %}
+<option>{{ idc }}</option>
+{% endfor %}
+</select>
+<button type="submit" name="down" id='down' class="btn btn-primary btn-sm hostadd_button">下载war</button>
+<br>
+说明：war包是从发布服务器192.168.10.249下载，下载前会和和线上的war包做MD5校验，确保下载的包为最新的war包<br>
+</div>
+{% endblock %}
