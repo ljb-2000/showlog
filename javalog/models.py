@@ -38,12 +38,13 @@ class Dblog(Model):
         return self.username
 class Cdnlog(Model):
     username = CharField(max_length=50)
-    name = CharField(max_length=100)
+    site = CharField(max_length=100)
     cdn = CharField(max_length=100)
     pv = CharField(max_length=100)
     size = CharField(max_length=100)
     hit = CharField(max_length=100)
     bad = CharField(max_length=100)
-    days = CharField(max_length=100)
+    day = CharField(max_length=100)
+    detail = TextField()
     def __unicode__(self):
         return self.username

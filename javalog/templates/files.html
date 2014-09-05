@@ -1,0 +1,91 @@
+{% extends 'index.html' %}
+
+{% block title %}文件共享库{% endblock %}
+
+{% block page-content %}
+<style type="text/css">
+ .btn_hidden{
+	display:none;
+	visibility:hidden;
+}
+ .span50{
+    width:100%;
+    min-width:100%;
+    min-height:75%;
+    height:75%;
+}
+</style>
+<script type="text/javascript">
+$(document).ready(function(){
+        var loading = new ol.loading({id:"loading"});
+        var username = $("#username").text();
+        $('#files').change(function(){
+            var files= $('#files').children('option:selected').val();
+            $("#ret").empty();
+            var obj = $("#data");
+            obj.val('');
+            $.getJSON("/showFile", {"files":files}, function(json){
+                var text = obj.val();
+                $.each(json,function(i,el){
+                    text = text+el;
+                });
+                obj.val(text);
+            });
+        });
+        $('#edit').click(function(){
+            var files = $("#files").children('option:selected').val();
+            var data = $("#data").val();
+            $.post("/editFile", {"files":files,"data":data}, function(json){
+                var obj = $("#ret");
+                obj.text(json);
+            });
+        });
+        $('#down').click(function(){
+                var files= $('#files').children('option:selected').val();
+                    if(files){
+                    window.location.href="http://192.168.6.30:8008/files/" +files;
+                    }
+        });
+        $('#del').click(function(){
+            if(window.confirm('确认删除吗？')){
+            var files= $('#files').children('option:selected').val();
+            $("#ret").empty();
+            var obj = $("#data");
+            obj.val('');
+            $.getJSON("/delFile", {"files":files}, function(json){
+                $("#files").empty();
+                $("#files").append("<option value=''>选择文件</option>");
+                $.each(json.files,function(i,el)
+                {
+                    $('#files').append("<option value='" +el + "'>" + el + "</option>");
+                });                
+                var obj = $("#ret");
+                obj.text(json.ret);   
+            });
+            }
+        });
+});
+</script>
+<h3>文件共享库</h3>
+说明：主要用于方便系统部给开发部门和测试部门提供的一个文件共享接口<br>
+管理员账户可在线编辑文本文件，实时更新文件，目录为/data/download/files<br>
+普通账户可在线查看文本文件，其他类型文件需下载查看<br>
+<hr style="border:0;background-color:#ff0000;height:1px;">
+{% if show %}<div id="upload">
+<form action="" method="post" name="upload" enctype="multipart/form-data">
+请选择上传的文件:<input id="id_file" name="file" type="file" />
+<button type="submit" class="btn btn-primary btn-sm hostadd_button">提交上传</button>
+</form>
+</div>{% endif %}
+<select name="files" id="files" class="input">
+<option value="">选择文件</option>
+{% for file in files %}
+<option>{{ file }}</option>
+{% endfor %}
+</select>
+{% if show %}<button id="edit" type="submit" class="btn btn-primary btn-sm hostadd_button">保存修改</button>
+<button id="del" name="del" type="submit" class="btn btn-primary btn-sm hostadd_button">删除文件</button>{% endif %}
+<button id="down" type="submit" class="btn btn-primary btn-sm hostadd_button">下载文件</button><br>
+<div id="ret">{{ ret }}</div>
+<textarea rows=25 class="span50" id="data"></textarea><br>
+{% endblock %}

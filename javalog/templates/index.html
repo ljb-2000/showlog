@@ -31,14 +31,30 @@
   <link rel="stylesheet" href="/static/css/bootstrap.min.css">
   <link rel="stylesheet" href="/static/css/bootstrap-responsive.min.css">
   <link rel="stylesheet" href="/static/css/opsinner.css">
+  <link rel="stylesheet" href="/static/loading/loading.css" type="text/css">
   <!-- end CSS-->
+    <!-- JavaScript at the bottom for fast page loading -->
 
+    <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
+<!--    <script>window.jQuery || document.write('<script src="/static/js/libs/jquery.min.js"><\/script>')</script>  -->
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+
+    <!-- scripts concatenated and minified via ant build script-->
+    <script src="/static/js/plugins.js"></script>
+    <script src="/static/js/script.js"></script>
+    <script src="/static/js/amcharts.js"></script>
+    <script src="/static/js/extra.js"></script>
+    <script src="/static/js/ichart.1.2.min.js"></script>
+    <script src="/static/loading/loading-min.js"></script>
+    <script src="/static/loading/jquery.bgiframe.min.js"></script>
+    <script src="/static/js/modernizr-2.0.6.min.js"></script>
+    <!-- end scripts-->
   <!-- More ideas for your <head> here: h5bp.com/d/head-Tips -->
 
   <!-- All JavaScript at the bottom, except for Modernizr / Respond.
        Modernizr enables HTML5 elements & feature detects; Respond is a polyfill for min/max-width CSS3 Media Queries
        For optimal performance, use a custom Modernizr build: www.modernizr.com/download/ -->
-  <script src="/static/js/libs/modernizr-2.0.6.min.js"></script>
 </head>
 
 <body>
@@ -46,7 +62,7 @@
     <div class="navbar navbar-fixed-top"> 
       <div class="navbar-inner"> 
         <div class="container-fluid"> 
-          <a class="brand" href="{% url 'index' %}">javalog日志查看平台</a> 
+          <a class="brand" href="{% url 'index' %}">JX日志查看平台</a> 
         <ul class="nav navbar-nav pull-right">
         <li><a href="#">欢迎 <span id="username">{{user.username}}</span></a></li>
         <li class="dropdown">
@@ -67,12 +83,15 @@
             <div class="span2"> 
                 <div class="well sidebar-nav"> 
             <ul class="nav nav-list">
-            <li class="nav-header">酒仙网</li>
+            <li class="nav-header"></li>
               <li><a href="{% url 'javalog' %}">javalog</a></li>
               <li><a href="{% url 'redis' %}">redis</a></li>
               <li><a href="{% url 'zookeeper' %}">zookeeper</a></li>
-              <li><a href="{% url 'downwar' %}">下载war包</a></li>
-              <li><a href="{% url 'hosts' %}">查看hosts</a></li>
+              <li><a href="{% url 'downwar' %}">war包/jar包</a></li>
+              <li><a href="{% url 'hosts' %}">hosts文件</a></li>
+              <li><a href="{% url 'dblog' %}">dberrorlog</a></li>
+              <li><a href="{% url 'files' %}">文件共享库</a></li>
+             {% if show %} <li><a href="{% url 'cdn' %}">cdn日志分析</a></li>{% endif %}
             </ul>  
                 </div><!--/.well --> 
             </div><!--/span--> 
@@ -97,21 +116,6 @@
  </div>
 </center>
     </div><!--/.fluid-container--> 
-
-    <!-- JavaScript at the bottom for fast page loading -->
-
-    <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
-<!--    <script>window.jQuery || document.write('<script src="/static/js/libs/jquery.min.js"><\/script>')</script>  -->
-    <script defer src="/static/js/jquery.min.js"></script>
-    <script defer src="/static/js/bootstrap.min.js"></script>
-
-    <!-- scripts concatenated and minified via ant build script-->
-    <script defer src="/static/js/plugins.js"></script>
-    <script defer src="/static/js/script.js"></script>
-    <script defer src="/static/js/amcharts.js"></script>
-    <script defer src="/static/js/extra.js"></script>
-    <script defer src="/static/js/ichart.1.2.min.js"></script>
-    <!-- end scripts-->
 
 
     <!-- Change UA-XXXXX-X to be your site's ID -->

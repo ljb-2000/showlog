@@ -1,13 +1,8 @@
 {% extends 'index.html' %}
 
-{% block title %}查看hosts{% endblock %}
+{% block title %}服务器hosts{% endblock %}
 
 {% block page-content %}
-{% load staticfiles %}
-<link href="/static/loading/loading.css" type="text/css"  rel="stylesheet"/>
-<script src="{% static "jquery.js" %}"></script>
-<script src="/static/loading/loading-min.js"></script>
-<script src="/static/loading/jquery.bgiframe.min.js"></script>
 <style type="text/css">
  .btn_hidden{
 	display:none;
@@ -22,26 +17,13 @@
 </style>
 <script type="text/javascript">
 $(document).ready(function(){
-        $("#edit").css("display","none");
         $('#idc').change(function(){
             var idc= $('#idc').children('option:selected').val();
             var username = $("#username").text();
-            if(username == 'root'){
-                $("#edit").css("display","inline");
-            }else if(username == "test" && idc == "ceshi"){
-                $("#edit").css("display","inline");
-            }else{
-                $("#edit").css("display","none");
-            }
             $("#ret").empty();
             $.getJSON("/showhosts", {"idc":idc}, function(json){
                 var obj = $("#data");
-                obj.val('');
-                var text = obj.val();
-                $.each(json,function(i,el){
-                    text = text+el;
-                });
-                obj.val(text);
+                obj.val(json);
             });
         });
         $('#edit').click(function(){
@@ -53,31 +35,28 @@ $(document).ready(function(){
             });
         });
         $('#sync').click(function(){
+            if(window.confirm('确认推送吗？')){
             var username = $("#username").text();
             var idc = $("#idc").children('option:selected').val();
             //var data = $("#data").val();
             $.post("/hostsync", {"idc":idc}, function(json){
-                if (json != ''){
-                    $('#ret').html(json.replace(/\n/g,"<br/>"))
-                    }else{
-                    alert('无操作权限，请联系管理员，谢谢！！！');
-                    }
+                $('#ret').html(json.replace(/\n/g,"<br/>"))
+                
             });
+        }
         });
 });
 </script>
-<h3>查看hosts</h3>
-<hr style="border:0;background-color:#ff0000;height:1px;">
-<select name="idc" id="idc" class="input-small" value={{ idc }}>
+<h3>服务器hosts</h3>
+<select name="idc" id="idc" class="input-small">
 <option>选择机房</option>
 {% for idc in idcs %}
 <option>{{ idc }}</option>
 {% endfor %}
 </select>
-<button id="sync" type="submit" class="btn btn-primary btn-sm hostadd_button">推送hosts</button>
-<br>
-<div id="ret"></div><br>
-<textarea rows=25 class="span50" id="data">{{ datas }}</textarea><br>
-<button id="edit" type="submit" class="btn btn-primary btn-sm hostadd_button">保存修改</button>
+{% if show %}<button id="edit" type="submit" class="btn btn-primary btn-sm hostadd_button">保存修改</button>
+<button id="sync" type="submit" class="btn btn-primary btn-sm hostadd_button">推送hosts</button><br>{% endif %}
+<span id="ret"></span>
+<textarea rows=25 class="span50" id="data"></textarea><br>
 </div>
 {% endblock %}

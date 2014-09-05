@@ -3,11 +3,6 @@
 {% block title %}CDN报告{% endblock %}
 
 {% block page-content %}
-{% load staticfiles %}
-<link href="/static/loading/loading.css" type="text/css"  rel="stylesheet"/>
-<script src="{% static "jquery.js" %}"></script>
-<script src="/static/loading/loading-min.js"></script>
-<script src="/static/loading/jquery.bgiframe.min.js"></script>
 <style type="text/css">
  .btn_hidden{
 	display:none;
@@ -22,29 +17,34 @@
 </style>
 <script type="text/javascript">
 $(document).ready(function(){
-
     $('#chart').click(function(){
         var site= $('#site').children('option:selected').val();
-        var idc= $('#idc').children('option:selected').val();
-        var ltime= $('#ltime').children('option:selected').val();
-     $.post("/chart", {"site":site,"idc":idc,"ltime":ltime}, function(json){
-       console.log(json);
-       json = window.eval(json);
-       window.dragFun(json);
-       window.PieFun(json);
+        var days= $('#days').children('option:selected').val();
+     $.getJSON("/getDays", {"site":site,"days":days}, function(json){
+        //console.log(json);
+        //json = window.eval(json);
+            window.drag3Fun(json.pv,"pv","访问流量",json.label,"    GB",site,days);
+            window.drag3Fun(json.hit,"hit","命中率",json.label,"    %",site,days);
+            window.drag3Fun(json.bad,"bad","加速效果不佳比例",json.label,"    %",site,days);
+            //window.drag2Fun(json.hit,"hit","回源率",json.label,"    %",site);
+            //window.drag2Fun(json.bad,"bad","加速效果不佳比例",json.label,"    %",site);
+            $('#detail').empty();
+            $("#cdn").empty();
+            
+        
     });
     });
 });
-window.PieFun = function(data){
+window.PieFun = function(data,id,text1){
     var chart = new iChart.Pie2D({
-        render : 'piediv',
+        render : id,
         data: data,
         title : {
-            text : '回源率',
+            text : text1,
             color : '#3e576f'
         },
         footnote : {
-            text : 'jiuxian.com',
+            text : '',
             color : '#486c8f',
             fontsize : 11,
             padding : '0 38'
@@ -67,6 +67,8 @@ window.PieFun = function(data){
                 color : '#ffffff'
             }
         },
+        //animation : true,//开启过渡动画
+        //animation_duration:800,//800ms完成动画
         shadow : true,
         shadow_blur : 6,
         shadow_color : '#aaaaaa',
@@ -84,54 +86,335 @@ window.PieFun = function(data){
     
     chart.draw();
 };
-     window.dragFun = function(data){
-        var chart = new iChart.Column2D({
-            render : 'canvasDiv',//渲染的Dom目标,canvasDiv为Dom的ID
-            data: data,//绑定数据
-            title : '访问量',//设置标题
-            width : 800,//设置宽度，默认单位为px
-            height : 400,//设置高度，默认单位为px
-            shadow:true,//激活阴影
-            shadow_color:'#c7c7c7',//设置阴影颜色
-           // coordinate:{//配置自定义坐标轴
-              //  scale:[{//配置自定义值轴
-              //       position:'left',//配置左值轴   
-              //       start_scale:0,//设置开始刻度为0
-              //       end_scale:26,//设置结束刻度为26
-              //       scale_space:2,//设置刻度间距
-              //       listeners:{//配置事件
-                       // parseText:function(t,x,y){//设置解析值轴文本
-                            //return {text:t+" cm"}
-                      //  }
-              //      }
-              //  }]
-            //}
-        });
-        //调用绘图方法开始绘图
-        chart.draw();
-    };
-//});
+window.dragFun = function(data,id,text1,unit){
+var chart = new iChart.Column2D({
+                render : id,
+                data : data,
+                title : {
+                    text : text1,
+                    color : '#3e576f'
+                },
+               // subtitle : {
+               //     text : '',
+               //     color : '#6d869f'
+               // },
+                footnote : {
+                    text : 'jiuxian.com',
+                    color : '#909090',
+                    fontsize : 11,
+                    padding : '0 38'
+                },
+                width : 800,
+                height : 400,
+                label : {
+                    fontsize:11,
+                    color : '#666666'
+                },
+                //animation : true,//开启过渡动画
+                //animation_duration:800,//800ms完成动画
+                shadow : true,
+                shadow_blur : 2,
+                shadow_color : '#aaaaaa',
+                shadow_offsetx : 1,
+                shadow_offsety : 0,
+                column_width : 62,
+                sub_option : {
+                    listeners : {
+                        parseText : function(r, t) {
+                            return t + unit;
+                        }
+                    },
+                    label : {
+                        fontsize:11,
+                        fontweight:600,
+                        color : '#4572a7'
+                    },
+                    border : {
+                        width : 2,
+                        //radius : '5 5 0 0',//上圆角设置
+                        color : '#ffffff'
+                    }
+                },
+                coordinate : {
+                    background_color : null,
+                    grid_color : '#c0c0c0',
+                    width : 680,
+                    axis : {
+                        color : '#c0d0e0',
+                        width : [0, 0, 1, 0]
+                    },
+                }
+            });
+            chart.draw();
+        };
+window.drag1Fun = function(data,id,text1,unit,site,cdn){
+var chart = new iChart.Column2D({
+                render : id,
+                data : data,
+                title : {
+                    text : text1,
+                    color : '#3e576f'
+                },
+               // subtitle : {
+               //     text : '',
+               //     color : '#6d869f'
+               // },
+                footnote : {
+                    text : cdn,
+                    color : '#909090',
+                    fontsize : 11,
+                    padding : '0 38'
+                },
+                width : 800,
+                height : 400,
+                //animation : true,//开启过渡动画
+                //animation_duration:800,//800ms完成动画
+                shadow : true,
+                shadow_blur : 2,
+                shadow_color : '#aaaaaa',
+                shadow_offsetx : 1,
+                shadow_offsety : 0,
+                column_width : 62,
+                   label : {
+                    fontsize:11,
+                    textAlign:'right',
+                    //textBaseline:'middle',
+                    rotate:-30,
+                    color : '#666666'
+                },
+                tip:{
+                    enable:true,
+                listeners:{
+                    //tip:提示框对象、name:数据名称、value:数据值、text:当前文本、i:数据点的索引
+                    parseText:function(tip,name,value,text,i){
+                        return name+":"+value+ unit;
+                    }
+                }
+                },
+                sub_option : {
+                    label :false,
+                    listeners : {
+                        parseText : function(r, t) {
+                            return t + unit;
+                        },
+                        click:function(r,e,m){
+                            //alert(r.get('name')+' '+r.get('value'));
+                            //var site = "www"
+                            //var cdn = "lx"
+                            var site= $('#site').children('option:selected').val();
+                            var cdn = $("#cdn").text();
+                            $.getJSON("/getDay", {"site":site,"cdn":cdn,"day":r.get('name')}, function(json){
+                            //console.log(json);
+                            //json = window.eval(json);
+                            //window.dragFun(json.pv,"pv","访问流量","G",cdn);
+                            //window.PieFun(json.hit,"hit","命中率","%",cdn);
+                            //window.dragFun(json.bad,"bad","加速效果不佳比例","%",cdn);
+                            $('#hit').empty();
+                            $('#bad').empty();
+                            $('#pv').empty();
+                            $('#detail').html(json.detail.replace(/\n/g,"<br/>"));
+                            });
+                        }
+                    },
+                    border : {
+                        width : 2,
+                        //radius : '5 5 0 0',//上圆角设置
+                        color : '#ffffff'
+                    }
+                },
+                coordinate : {
+                    background_color : null,
+                    grid_color : '#c0c0c0',
+                    width : 680,
+                    height : 260,
+                    axis : {
+                        color : '#c0d0e0',
+                        width : [0, 0, 1, 0]
+                    },
+                }
+            });
+            chart.draw();
+        };
+window.drag2Fun = function(data,id,text1,labels,unit,site,days){
+    var chart = new iChart.ColumnMulti3D({
+        render : id,
+        data: data,
+        labels:labels,
+        title : {
+            text : text1,
+            color : '#3e576f'
+        },
+        footnote : {
+            text : '',
+            color : '#909090',
+            fontsize : 11,
+            padding : '0 44'
+        },
+        width : 800,
+        height : 400,
+        background_color : '#ffffff',
+        legend:{
+            enable:true,
+            background_color : null,
+            align : 'center',
+            valign : 'bottom',
+            row:1,
+            column:'max',
+            border : {
+                enable : false
+            }
+        },
+        column_width : 8,//柱形宽度
+        zScale:8,//z轴深度倍数
+        xAngle : 50,
+        bottom_scale:1.1,
+        label:{
+            color:'#4c4f48'
+        },
+        sub_option:{
+            label :false,
+                    listeners : {
+                        click:function(r,e,m){
+                            $.getJSON("/getCdn", {"site":site,"cdn":r.get('name'),"days":days}, function(json){
+                            //console.log(json);
+                            //json = window.eval(json);
+                            window.drag1Fun(json.pv,"pv","访问流量","G");
+                            window.drag1Fun(json.hit,"hit","命中率","%");
+                            window.drag1Fun(json.bad,"bad","加速效果不佳比例","%");
+                            $('#detail').empty();
+                            });
+                        }
+                    },
+        },
+        tip:{
+            enable :true
+        },
+        text_space : 16,//坐标系下方的label距离坐标系的距离。
+        coordinate:{
+            background_color : '#d7d7d5',
+            grid_color : '#a4a4a2',
+            color_factor : 0.24,
+            board_deep:10,
+            offsety:-10,
+            pedestal_height:10,
+            left_board:false,//取消左侧面板
+            width:620,
+            height:240,
+        }
+    });
+    chart.plugin(new iChart.Custom({
+        drawFn:function(){
+            //计算位置
+            var coo = chart.getCoordinate(),
+                x = coo.get('originx'),
+                y = coo.get('originy');
+            //在左上侧的位置，渲染一个单位的文字
+            chart.target.textAlign('start')
+            .textBaseline('bottom')
+            .textFont('600 11px Verdana')
+            .fillText(unit,x-40,y-28,false,'#6d869f');
+            
+        }
+                }));
+    chart.draw();
+};
+window.drag3Fun = function(data,id,text1,labels,unit,site,days){
+    var chart = new iChart.ColumnMulti2D({
+            render : id,
+            data: data,
+            labels:labels,
+            title : text1,
+            footnote : '',
+            width : 800,
+            height : 400,
+            background_color : '#ffffff',
+            sub_option:{
+                label : false,
+                    listeners : {
+                        click:function(r,e,m){
+                            if (r.get('name') =="网宿"){cdn = 'ws'}
+                            if (r.get('name') =="蓝汛"){cdn = 'lx'}
+                            if (r.get('name') =="搜狐"){cdn = 'sh'}
+                            $.getJSON("/getCdn", {"site":site,"cdn":cdn,"days":days}, function(json){
+                            //console.log(json);
+                            //json = window.eval(json);
+                            var obj = $("#cdn");
+                            obj.text(json.cdn);
+                            window.drag1Fun(json.pv,"pv","访问流量","G");
+                            window.drag1Fun(json.hit,"hit","命中率","%");
+                            window.drag1Fun(json.bad,"bad","加速效果不佳比例","%");
+                            $('#detail').empty();
+                            });
+                        }
+                    },
+            },
+            legend:{
+                enable:true,
+                background_color : null,
+                //align : 'center',
+                //valign : 'bottom',
+                //row:1,
+                //column:'max',
+                border : {
+                    enable : false
+                }
+            },
+            label : {
+                fontsize:11,
+                textAlign:'right',
+                //textBaseline:'middle',
+                rotate:-30,
+                color : '#666666'
+            },
+            tip:{
+                enable :true,
+                listeners:{
+                    //tip:提示框对象、name:数据名称、value:数据值、text:当前文本、i:数据点的索引
+                    parseText:function(tip,name,value,text,i){
+                        return name+":"+value+ unit;
+                    }
+                }
+            },
+            coordinate:{
+                background_color : '#f1f1f1',
+                scale:[{
+                     position:'left',   
+                     start_scale:0,
+                }],
+                width:680,
+                height:260
+            }
+    });
+    chart.draw();
+};
 </script>
-<h3>cdnl日志分析报告</h3>
+<h3>cdn日志分析报告</h3>
+说明：查看指定日期详细报告请单击图表中的柱状图<br>
+因网宿暂时未提供原始日志，无法统计命中率，图中显示为命中率0%,请忽视该结果<br>
 <hr style="border:0;background-color:#ff0000;height:1px;">
 <select name="site" id="site" class="input">
-<option value="www">www.jiuxian.com</option>
-<option value="misc">misc.jiuxian.com</option>
-<option value="img06">img06.jiuxian.com</option>
+<option>选择域名</option>
+{% for site in sites %}
+<option>{{ site }}</option>
+{% endfor %}
 </select>
-<select name="cdn" id="cdn" class="input">
-<option value="ws">网宿</option>
-<option value="lx">蓝汛</option>
-<option value="sh">搜狐</option>
-</select>
-<select name="ltime" id="ltime" class="input">
-<option value="1">最近1天</option>
-<option value="2">最近2天</option>
-<option value="7">最近7天</option>
-<option value="30">最近30天</option>
+<select name="days" id="days" class="input">
+<option value=''>选择时间段</option>
+<option value='2'>最近2天</option>
+<option value='7'>最近7天</option>
+<option value='15'>最近15天</option>
+<option value='30'>最近30天</option>
 </select>
 <button type="submit" id='chart' class="btn btn-primary btn-sm hostadd_button">查询</button>
 <br>
-<div id='piediv'></div>
-<div id='canvasDiv'></div>
+<div id='pv'></div>
+<br>
+<div id='hit'></div>
+<br>
+<div id='bad'></div>
+<br>
+<div id='detail'></div>
+<br>
+<span id="cdn"></span>
+<br><br>
 {% endblock %}

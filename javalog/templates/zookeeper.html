@@ -3,8 +3,6 @@
 {% block title %}zookeeper{% endblock %}
 
 {% block page-content %}
-{% load staticfiles %}
-<script src="{% static "jquery.js" %}"></script>
 <style type="text/css">
  .btn_hidden{
     display:none;
@@ -24,13 +22,8 @@ $(document).ready(function(){
             var idc = $(this).children('option:selected').val();
             var username = $("#username").text();
             $("#file").val(0); 
-            if(username == 'root'){
-                $("#restart").css("display","inline");
-            }else if(username == "test" && idc == "ceshi"){
-                $("#restart").css("display","inline");
-            }else{
-                $("#restart").css("display","none");
-            }
+            $("#edit").css("display","none");
+            $("#ret").empty();
             $.getJSON("/zookeepergetip", {"idc":idc}, function(json){ 
                 var obj = $("#data");
                 obj.val('');
@@ -70,13 +63,7 @@ $(document).ready(function(){
             var file = $("#file").children('option:selected').val();
             var username = $("#username").text();
             //alert(idc);
-            if(username == 'root'){
-                $("#edit").css("display","inline");
-            }else if(username == "test" && idc == "ceshi"){
-                $("#edit").css("display","inline");
-            }else{
-                $("#edit").css("display","none");
-            }
+            $("#edit").css("display","inline");
             $.getJSON("/zookeeperview", {"idc":idc,"ip":ip,"file":file}, function(json){ 
                 var obj = $("#data");
                 obj.val(json);
@@ -106,41 +93,36 @@ $(document).ready(function(){
             });
         });
         $('#restart').click(function(){
+            if(window.confirm('确认重启吗？')){
             var idc = $("#idc").children('option:selected').val();
             var ip = $("#ip").children('option:selected').val();
             $("#edit").css("display","none");
             $.post("/zookeeperrestart", {"idc":idc,"ip":ip}, function(json){
                 var obj = $("#data");
-                obj.val('');
                 $("#ret").empty();
                 obj.val(json);
             });
+        }
         });
 });
 </script>
 <h3>zookeeper配置文件查看</h3>
-<select name="idc" id="idc" class="input-small" value={{ idc }}>
+<select name="idc" id="idc" class="input-small">
 <option>选择机房</option>
 {% for idc in idcs %}
 <option>{{ idc }}</option>
 {% endfor %}
 </select>
-<select name="ip" id="ip" class="input-small" value={{ ip }}>
+<select name="ip" id="ip" class="input-small">
 <option>选择IP</option>
-{% for ip in ips %}
-<option>{{ ip }}</option>
-{% endfor %}
 </select>
-<select name="file" id="file" class="input-small" value={{ file }}>
+<select name="file" id="file" class="input-small">
 <option>选择文件</option>
-{% for file in files %}
-<option>{{ file }}</option>
-{% endfor %}
 </select>
 <button id="view" type="submit" class="btn btn-primary btn-sm hostadd_button">查看文件</button>
 <button id='status' type="submit" class="btn btn-primary btn-sm hostadd_button">查看zookeeper状态</button>
-<button id='restart' type="submit" class="btn btn-primary btn-sm hostadd_button">重启zookeeper状态</button><br>
-<textarea rows=30 class="span50" id="data"></textarea><br>
-<button id="edit" type="submit" class="btn btn-primary btn-sm hostadd_button">保存修改</button>
+{% if show %}<button id='restart' type="submit" class="btn btn-primary btn-sm hostadd_button">重启zookeeper</button><br>{% endif %}
+<textarea rows=25 class="span50" id="data"></textarea><br>
+{% if show %}<button id="edit" type="submit" class="btn btn-primary btn-sm hostadd_button">保存修改</button>{% endif %}
 <span id="ret"></span><br>
 {% endblock %}

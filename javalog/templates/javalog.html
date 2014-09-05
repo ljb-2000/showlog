@@ -3,11 +3,6 @@
 {% block title %}javalog{% endblock %}
 
 {% block page-content %}
-{% load staticfiles %}
-<link href="/static/loading/loading.css" type="text/css"  rel="stylesheet"/>
-<script src="{% static "jquery.js" %}"></script>
-<script src="/static/loading/loading-min.js"></script>
-<script src="/static/loading/jquery.bgiframe.min.js"></script>
 <style type="text/css">
  .btn_hidden{
 	display:none;
@@ -32,11 +27,11 @@ $(document).ready(function(){
                 var obj = $("#data");
                 obj.val('');
 				$("#idc").empty();
-				$("#ip").empty();
+				$("#ipdir").empty();
                 $("#dirtype").val(0);
 				$("#file").empty();
                 $("#idc").append("<option>选择机房</option>");
-                $("#ip").append("<option>选择IP</option>");
+                $("#ipdir").append("<option>选择IP</option>");
                 $("#file").append("<option>选择文件</option>");
 				$.each(json,function(i,el)
 				{
@@ -55,53 +50,33 @@ $(document).ready(function(){
 			$.getJSON("/getIp", {"name":name,"idc":idc}, function(json){ 
                 var obj = $("#data");
                 obj.val('');
-				$("#ip").empty();
+				$("#ipdir").empty();
 				$("#file").empty();
 				$("#file").append("<option>选择文件</option>");
 				$.each(json,function(i,el)
 				{
-					$('#ip').append("<option value='" +el + "'>" + el + "</option>");
+					$('#ipdir').append("<option value='" +el + "'>" + el + "</option>");
 				});
 			});
-            //window.alert($.trim(username) != 'root');
-            if(username == 'root'){
-                $("#restart").css("display","inline");
-                $("#stop").css("display","inline");
-            }else if(username == "test" && idc == "ceshi"){
-                $("#restart").css("display","inline");
-                $("#stop").css("display","inline");
-            }else{
-                $("#restart").css("display","none");
-                $("#stop").css("display","none");
-            }  
 		});
-        $('#ip').change(function(){
+        $('#ipdir').change(function(){
             isLoad = false;
             clearTimeout(window.pronumtimeout);
             var name= $('#project_name').children('option:selected').val();
             var idc= $('#idc').children('option:selected').val();
-            var ip= $('#ip').children('option:selected').val();
+            var ipdir= $('#ipdir').children('option:selected').val();
             var dirtype= $('#dirtype').val(0);
             $('#file').empty();
             $("#file").append("<option>选择文件</option>");
         });
-//        $('#day').change(function(){
-//            clearTimeout(window.pronumtimeout);
-//            var name= $('#project_name').children('option:selected').val();
-//            var idc= $('#idc').children('option:selected').val();
-//            var ip= $('#ip').children('option:selected').val();
-//            var dirtype= $('#dirtype').val(0);
-//           $('#file').empty();
-//            $("#file").append("<option>选择文件</option>");
-//        });
         $('#dirtype').change(function(){
             isLoad = false;
             clearTimeout(window.pronumtimeout);
             var name= $('#project_name').children('option:selected').val();
             var idc= $('#idc').children('option:selected').val();
-            var ip= $('#ip').children('option:selected').val();
+            var ipdir= $('#ipdir').children('option:selected').val();
             var dirtype= $('#dirtype').children('option:selected').val();
-            $.getJSON("/getFile", {"name":name,"idc":idc,"ip":ip,"dirtype":dirtype}, function(json){
+            $.getJSON("/getFile", {"name":name,"idc":idc,"ipdir":ipdir,"dirtype":dirtype}, function(json){
                 var obj = $("#data");
                 obj.val('');
                     $("#file").empty();
@@ -119,12 +94,12 @@ $(document).ready(function(){
             isLoad = true;
             var name= $('#project_name').children('option:selected').val();
             var idc= $('#idc').children('option:selected').val();
-            var ip= $('#ip').children('option:selected').val();
+            var ipdir= $('#ipdir').children('option:selected').val();
             var dirtype= $('#dirtype').children('option:selected').val();
             var file= $('#file').children('option:selected').val();
             var num= $('#num').val();
             var top = $("#data").scrollTop();
-			$.getJSON("/showLog", {"name":name,"idc":idc,"ip":ip,"num":num,"dirtype":dirtype,"file":file}, function(json){
+			$.getJSON("/showLog", {"name":name,"idc":idc,"ipdir":ipdir,"num":num,"dirtype":dirtype,"file":file}, function(json){
                 var obj = $("#data");
                 obj.val('');
                 var text = obj.val();
@@ -145,16 +120,11 @@ $(document).ready(function(){
                 if(window.confirm('确认重启吗？')){
                 var name= $('#project_name').children('option:selected').val();
                 var idc= $('#idc').children('option:selected').val();
-                var ip= $('#ip').children('option:selected').val();
+                var ipdir= $('#ipdir').children('option:selected').val();
                 var num= $('#num').val();
-                $.getJSON("/restart", {"name":name,"idc":idc,"ip":ip,"num":num}, function(json){
+                $.getJSON("/restart", {"name":name,"idc":idc,"ipdir":ipdir,"num":num}, function(json){
                     var obj = $("#data");
-                    obj.val('');
-                    var text = obj.val();
-                    $.each(json,function(i,el){
-                        text = text+'\n'+el;
-                    });
-                    obj.val(text);
+                    obj.val(json);
                 });
                 }
         });
@@ -164,16 +134,11 @@ $(document).ready(function(){
                 if(window.confirm('确认停止吗？')){
                 var name= $('#project_name').children('option:selected').val();
                 var idc= $('#idc').children('option:selected').val();
-                var ip= $('#ip').children('option:selected').val();
+                var ipdir= $('#ipdir').children('option:selected').val();
                 var num= $('#num').val();
-                $.getJSON("/stop", {"name":name,"idc":idc,"ip":ip,"num":num}, function(json){
+                $.getJSON("/stop", {"name":name,"idc":idc,"ipdir":ipdir,"num":num}, function(json){
                     var obj = $("#data");
-                    obj.val('');
-                    var text = obj.val();
-                    $.each(json,function(i,el){
-                        text = text+'\n'+el;
-                    });
-                    obj.val(text);
+                    obj.val(json);
                 });
                 }
         });
@@ -182,9 +147,9 @@ $(document).ready(function(){
                 clearTimeout(window.pronumtimeout);
                 var name= $('#project_name').children('option:selected').val();
                 var idc= $('#idc').children('option:selected').val();
-                var ip= $('#ip').children('option:selected').val();
+                var ipdir= $('#ipdir').children('option:selected').val();
                 var num= $('#num').val();
-                $.getJSON("/status", {"name":name,"idc":idc,"ip":ip,"num":num}, function(json){
+                $.getJSON("/status", {"name":name,"idc":idc,"ipdir":ipdir,"num":num}, function(json){
                         //$("#data").empty();
                         //$.each(json,function(i,el)
                         //{
@@ -204,21 +169,24 @@ $(document).ready(function(){
                 clearTimeout(window.pronumtimeout);
                 var name= $('#project_name').children('option:selected').val();
                 var idc= $('#idc').children('option:selected').val();
-                var ip= $('#ip').children('option:selected').val();
                 var dirtype= $('#dirtype').children('option:selected').val();
                 var file= $('#file').children('option:selected').val();
-                var ip= $('#ip').children('option:selected').val();
+                var ipdir= $('#ipdir').children('option:selected').val();
                 var num= $('#num').val();
-                var rnum= Math.floor(Math.random()*10);
+                //var rnum= Math.floor(Math.random()*10);
                 loading.show();
-                $.getJSON("/down", {"name":name,"idc":idc,"ip":ip,"num":num,"dirtype":dirtype,"file":file,"rnum":rnum}, function(json){
+                $.getJSON("/down", {"name":name,"idc":idc,"ipdir":ipdir,"num":num,"dirtype":dirtype,"file":file}, function(json){
                    // console.log(json);
-                    loading.hide();
-                    if (json != 'false'){
-                    window.location.href="http://192.168.6.30:8009/" + rnum + "_" + file;
+                    if (json == 'ok'){
+                        if (idc != "ceshi"){
+                            window.location.href="http://192.168.10.249:8008/" + ipdir + "_" + file;
+                        }else{
+                            window.location.href="http://192.168.6.30:8008/" + ipdir + "_" + file;
+                        }
                     }else{
-                    alert('由于下载的文件大于20M，无法下载，请联系管理员，谢谢！！！');
+                        alert(json + ',无法下载，请联系管理员，谢谢！！！');
                     }
+                    loading.hide();
                 });
         });
         $('#stoplog').click(function(){
@@ -231,51 +199,42 @@ $(document).ready(function(){
 </script>
 <div id="loading">
 <h3>java日志查看</h3>
-说明：行数默认150行，600行以上可能会响应很慢或者不显示，建议下载日志文件在本地查看<br>
-日志是实时刷新的，每2秒钟刷新最后N行<br>
-不同的账号所拥有的权限不一样，当选择机房时重启tomcat等按钮会自动隐藏<br>
-tomcat启动日志及程序日志都是按大小10M轮询，并打包压缩，保留20份,保存格式如：xxxxx.1.gz<br>
+说明：日志是实时刷新的，每2秒钟刷新最后N行<br>
+行数默认150行，如出现不显示日志，请先尝试行数改小，需查看的历史日志请下载日志文件在本地查看<br>
 注意：如果提示找不到文件，请修改程序中的日志输出格式，按以下日志命名规范<br>
 程序日志统一输出到/log/web/service/工程war包名_runtime_info.log 如：/log/web/service/JXService-Merchant_runtime_info.log<br>
-对于使用过程中遇到问题及日志保存需求请联系huanghuirong@jiuxian.com，谢谢！<br>
+tomcat启动日志及程序日志都是按天归档，并打包压缩，保留60天日志,保存格式如：JXService-Merchant_runtime_info.log.20140902.gz<br>
+普通账户能查看和下载日志，测试账户对测试环境有重启和停止tomcat权限，超级管理员账户对所有服务器有重启和停止tomcat权限<br>
+对于使用过程中遇到问题及其他需求请联系huanghuirong@jiuxian.com，谢谢！<br>
 <hr style="border:0;background-color:#ff0000;height:1px;">
-<select name="name" id="project_name" class="input-small" value={{ name }}>
+<select name="name" id="project_name" class="input-small">
 <option>选择工程名</option>
 {% for name in names %}
 <option>{{ name }}</option>
 {% endfor %}
 </select>
-<select name="idc" id="idc" class="input-small" value={{ idc }}>
+<select name="idc" id="idc" class="input-small">
 <option>选择机房</option>
-{% for idc in idcs %}
-<option>{{ idc }}</option>
-{% endfor %}
 </select>
-<select name="ip" id="ip" class="input" value={{ ip }}>
+<select name="ipdir" id="ipdir" class="input">
 <option>选择IP</option>
-{% for ip in ips %}
-<option>{{ ip }}</option>
-{% endfor %}
 </select>
-<select name="dirtype" id="dirtype" class="input-small" value={{ dirtype }}>
+<select name="dirtype" id="dirtype" class="input-small">
 <option value=''>选择日志类型</option>
 <option>tomcat</option>
 <option>services</option>
 </select>
-<select name="file" id="file" class="input" value={{ file }}>
+<select name="file" id="file" class="input">
 <option>选择文件</option>
-{% for file in files %}
-<option>{{ file }}</option>
-{% endfor %}
 </select>
 最后行数:<input type="text" id='num' class="input-small" name='num' value={{ num }}>
 <button type="submit" name="pronum" id='pronum' class="btn btn-primary btn-sm hostadd_button">查看日志</button>
 <button type="submit" name="stoplog" id='stoplog' class="btn btn-primary btn-sm hostadd_button">暂停日志刷新</button>
 <button type="submit" name="down" id='down' class="btn btn-primary btn-sm hostadd_button">下载日志</button>
 <button type="submit" name="action" id='status' class="btn btn-primary btn-sm hostadd_button" value="status">查看tomcat状态</button>
-<button type="submit" name="restart" id='restart' class="btn btn-primary btn-sm hostadd_button">重启tomcat</button>
-<button type="submit" name="stop" id='stop' class="btn btn-primary btn-sm hostadd_button">停止tomcat</button>
+{% if show %}<button type="submit" name="restart" id='restart' class="btn btn-primary btn-sm hostadd_button">重启tomcat</button>
+<button type="submit" name="stop" id='stop' class="btn btn-primary btn-sm hostadd_button">停止tomcat</button>{% endif %}
 <br>
-<textarea rows=25 class="span50" id="data">{{ datas }}</textarea><br>
+<textarea rows=25 class="span50" id="data"></textarea><br>
 </div>
 {% endblock %}

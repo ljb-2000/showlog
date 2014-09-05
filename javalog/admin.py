@@ -15,7 +15,7 @@ class PasswdAdmin(admin.ModelAdmin):
 class DblogAdmin(admin.ModelAdmin):
     list_display = ('username','dbname','ip')
 class CdnlogAdmin(admin.ModelAdmin):
-    list_display = ('username','name','cdn','pv','size','hit','bad','days')
+    list_display = ('username','site','cdn','pv','size','hit','bad','day','detail')
 admin.site.register(Javalog,JavalogAdmin)
 admin.site.register(Redis,RedisAdmin)
 admin.site.register(Zookeeper,ZookeeperAdmin)

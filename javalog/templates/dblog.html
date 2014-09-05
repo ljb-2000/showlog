@@ -1,13 +1,8 @@
 {% extends 'index.html' %}
 
-{% block title %}Dblog日志{% endblock %}
+{% block title %}数据库错误日志{% endblock %}
 
 {% block page-content %}
-{% load staticfiles %}
-<link href="/static/loading/loading.css" type="text/css"  rel="stylesheet"/>
-<script src="{% static "jquery.js" %}"></script>
-<script src="/static/loading/loading-min.js"></script>
-<script src="/static/loading/jquery.bgiframe.min.js"></script>
 <style type="text/css">
  .btn_hidden{
 	display:none;
@@ -94,7 +89,7 @@ $(document).ready(function(){
                    // console.log(json);
                     loading.hide();
                     if (json != 'false'){
-                    window.location.href="http://192.168.5.30:8009/" + rnum + "_" + file;
+                    window.location.href="http://192.168.6.30:8008/" + rnum + "_" + file;
                     }else{
                     alert('由于下载的文件大于20M，无法下载，请联系管理员，谢谢！！！');
                     }
@@ -109,33 +104,27 @@ $(document).ready(function(){
 
 </script>
 <div id="loading">
-<h3>Dblog日志</h3>
-说明：行数默认150行，600行以上可能会响应很慢或者不显示，建议下载日志文件在本地查看<br>
-日志是实时刷新的，每2秒钟刷新最后N行<br>
+<h3>数据库错误日志</h3>
+说明：日志是实时刷新的，每2秒钟刷新最后N行<br>
+行数默认50行，如出现不显示日志，请先尝试行数改小，需查看的历史日志请下载日志文件在本地查看<br>
 <hr style="border:0;background-color:#ff0000;height:1px;">
-<select name="name" id="dbname" class="input-small" value={{ name }}>
+<select name="name" id="dbname" class="input-small">
 <option>选择数据库</option>
 {% for dbname in dbnames %}
 <option>{{ dbname }}</option>
 {% endfor %}
 </select>
-<select name="ip" id="ip" class="input" value={{ ip }}>
+<select name="ip" id="ip" class="input">
 <option>选择IP</option>
-{% for ip in ips %}
-<option>{{ ip }}</option>
-{% endfor %}
 </select>
-<select name="file" id="file" class="input" value={{ file }}>
+<select name="file" id="file" class="input">
 <option>选择文件</option>
-{% for file in files %}
-<option>{{ file }}</option>
-{% endfor %}
 </select>
 最后行数:<input type="text" id='num' class="input-small" name='num' value={{ num }}>
 <button type="submit" name="showlog" id='showlog' class="btn btn-primary btn-sm hostadd_button">查看错误日志</button>
 <button type="submit" name="stoplog" id='stoplog' class="btn btn-primary btn-sm hostadd_button">停止刷新日志</button>
 <button type="submit" name="down" id='down' class="btn btn-primary btn-sm hostadd_button">下载日志</button>
 <br>
-<textarea rows=25 class="span50" id="data">{{ datas }}</textarea><br>
+<textarea rows=25 class="span50" id="data"></textarea><br>
 </div>
 {% endblock %}
