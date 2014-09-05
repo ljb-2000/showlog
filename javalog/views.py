@@ -456,9 +456,8 @@ def war(request):
     m1= ssh(ip,passwd,md5cmd1)[ip]
     if m.split()[0] == m1.split()[0]:
         f = m.split()[1]
-        cmd = "cp %s /data/download/"
+        cmd = "sudo /bin/cp -a %s /data/download/" % f
         ret = ssh(mip,passwd,cmd)[mip]
-        #f = f.lstrip("/data/update/backup/bak_online_war/www_after/") 
         json = simplejson.dumps(warname)
     else:
         json = simplejson.dumps('false')
